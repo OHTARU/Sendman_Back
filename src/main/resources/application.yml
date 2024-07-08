@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: backend
+  profiles:
+    include: db
+
+# dev tool
+logging:
+  level:
+    root: DEBUG
+# springdoc-swagger
+#springdoc:
+#  default-consumes-media-type: application/json;charset=UTF-8
+#  default-cdefault-produces-media-type: application/json;charset=UTF-8
+#  paths-to-match: /**
+#  swagger-ui:
+#    path: /
+#    display-request-duration: true
+#    groups-order: desc
+#    operations-sorter: alpha
+#    disable-swagger-default-url: true
+#  api-docsgroups:
+#    enabled: true
