@@ -12,8 +12,15 @@ import java.net.URI;
 @RequestMapping(value = "/login",produces = "application/json")
 public class LoginController {
     private final LoginService loginService;
+
     @GetMapping("/{registrationId}")
     ResponseEntity<?> OAuthLogin(@RequestParam String code, @PathVariable(value = "registrationId") String registrationId){
-        return ResponseEntity.created(URI.create("/login/code?"+code+"/"+registrationId)).body(loginService.socialLogin(code, registrationId));
+        try {
+            return loginService.socialLogin(code, registrationId);
+        }catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e);
+        }
     }
+
+
 }

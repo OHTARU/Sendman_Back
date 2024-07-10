@@ -7,25 +7,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sendman.backend.dto.GoogleUserinfoResponseDTO;
 
 @Entity
 @NoArgsConstructor
 @Getter
 public class User extends BaseTimeEntity{
     @Id
-    Long id;
+    String id;
     String email;
     String name;
 
-    public User from(Long id,String email, String name){
+    public static User from(GoogleUserinfoResponseDTO dto){
         return User.builder()
-                .id(id)
-                .email(email)
-                .name(name)
+                .id(dto.id())
+                .email(dto.email())
+                .name(dto.name())
                 .build();
     }
     @Builder
-    public User(Long id, String email, String name) {
+    public User(String id, String email, String name) {
         this.id = id;
         this.email = email;
         this.name = name;

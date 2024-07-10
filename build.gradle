@@ -26,8 +26,10 @@ repositories {
 dependencies {
 	//JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
 	//security
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	//web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	//dev
@@ -37,12 +39,17 @@ dependencies {
 	//lombok
 	annotationProcessor 'org.projectlombok:lombok'
 	compileOnly 'org.projectlombok:lombok'
+	//webClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	//JWT
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.5'
+
 	//test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	//mysql
-	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
 tasks.named('test') {
