@@ -1,4 +1,4 @@
-package sendman.backend.dto.user;
+package sendman.backend.account.dto;
 
 
 public record GoogleUserinfoResponseDTO(

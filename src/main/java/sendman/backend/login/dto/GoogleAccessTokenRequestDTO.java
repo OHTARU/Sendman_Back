@@ -1,4 +1,4 @@
-package sendman.backend.dto.login;
+package sendman.backend.login.dto;
 
 import lombok.Builder;
 

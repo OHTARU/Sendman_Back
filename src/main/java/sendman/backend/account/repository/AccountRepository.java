@@ -1,9 +1,8 @@
-package sendman.backend.domain.repository;
+package sendman.backend.account.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sendman.backend.account.domain.Account;
-import sendman.backend.domain.User;
 
 import java.util.Optional;
 

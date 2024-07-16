@@ -1,11 +1,9 @@
-package sendman.backend.controller;
+package sendman.backend.login.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sendman.backend.service.LoginService;
-
-import java.net.URI;
+import sendman.backend.login.service.LoginService;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package sendman.backend.config;
+package sendman.backend.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import sendman.backend.filter.JwtAuthenticationFilter;
+import sendman.backend.common.filter.JwtAuthenticationFilter;
 
 import java.util.Collections;
 

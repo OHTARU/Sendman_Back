@@ -1,4 +1,4 @@
-package sendman.backend.common;
+package sendman.backend.common.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

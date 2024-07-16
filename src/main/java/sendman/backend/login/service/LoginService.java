@@ -1,16 +1,16 @@
-package sendman.backend.service;
+package sendman.backend.login.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import sendman.backend.config.TokenProvider;
-import sendman.backend.domain.User;
-import sendman.backend.domain.repository.UserRepository;
-import sendman.backend.dto.login.AccessTokenResponseDTO;
-import sendman.backend.dto.login.GoogleAccessTokenRequestDTO;
-import sendman.backend.dto.login.GoogleAccessTokenResponseDTO;
+import sendman.backend.account.domain.Account;
+import sendman.backend.account.repository.AccountRepository;
+import sendman.backend.common.service.TokenProvider;
+import sendman.backend.login.dto.AccessTokenResponseDTO;
+import sendman.backend.login.dto.GoogleAccessTokenRequestDTO;
+import sendman.backend.login.dto.GoogleAccessTokenResponseDTO;
 import sendman.backend.account.dto.GoogleUserinfoResponseDTO;
 
 import java.net.URI;
@@ -20,7 +20,7 @@ import java.net.URI;
 public class LoginService {
     private final Environment env;
     private final WebClient webClient = WebClient.builder().build();
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final TokenProvider tokenProvider;
 
     public ResponseEntity<AccessTokenResponseDTO> googleLogin(String code, String registrationId){
@@ -30,8 +30,8 @@ public class LoginService {
         GoogleUserinfoResponseDTO userinfo = getUserResource(accessToken, registrationId);
 
         //유저 검색
-        if(userRepository.findById(userinfo.id()).isPresent()){
-            User user = userRepository.findById(userinfo.id()).get();
+        if(accountRepository.findById(userinfo.id()).isPresent()){
+            Account user = accountRepository.findById(userinfo.id()).get();
             //유저가 있을 경우 jwt 제공
             return ResponseEntity.ok().body(
                     AccessTokenResponseDTO.builder()
@@ -40,7 +40,7 @@ public class LoginService {
             );
         }else {
             //유저가 없을 경우 회원 저장 후 jwt 제공
-            userRepository.save(User.from(userinfo));
+            accountRepository.save(Account.from(userinfo));
             return ResponseEntity.created(URI.create("/login/code?"+code+"/"+registrationId)).body(
                     AccessTokenResponseDTO.builder()
                             .accesstoken(tokenProvider.createAccessToken(String.format("%s:%s",userinfo.email(),"ROLE_USER")))
