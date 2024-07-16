@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import sendman.backend.config.filter.JwtAuthenticationFilter;
+import sendman.backend.filter.JwtAuthenticationFilter;
 
 import java.util.Collections;
 

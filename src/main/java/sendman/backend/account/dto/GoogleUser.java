@@ -1,6 +1,4 @@
-package sendman.backend.dto;
-
-import lombok.Getter;
+package sendman.backend.dto.user;
 
 
 public record GoogleUser(

@@ -16,7 +16,7 @@ public class LoginController {
     @GetMapping("/{registrationId}")
     ResponseEntity<?> OAuthLogin(@RequestParam String code, @PathVariable(value = "registrationId") String registrationId){
         try {
-            return loginService.socialLogin(code, registrationId);
+            return loginService.googleLogin(code, registrationId);
         }catch (RuntimeException e){
             return ResponseEntity.badRequest().body(e);
         }

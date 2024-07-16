@@ -1,16 +1,17 @@
 package sendman.backend.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.Token;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import sendman.backend.config.TokenProvider;
 import sendman.backend.domain.User;
-import sendman.backend.domain.UserRepository;
-import sendman.backend.dto.*;
+import sendman.backend.domain.repository.UserRepository;
+import sendman.backend.dto.login.AccessTokenResponseDTO;
+import sendman.backend.dto.login.GoogleAccessTokenRequestDTO;
+import sendman.backend.dto.login.GoogleAccessTokenResponseDTO;
+import sendman.backend.account.dto.GoogleUserinfoResponseDTO;
 
 import java.net.URI;
 
@@ -22,7 +23,7 @@ public class LoginService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
 
-    public ResponseEntity<AccessTokenResponseDTO> socialLogin(String code, String registrationId) throws RuntimeException{
+    public ResponseEntity<AccessTokenResponseDTO> googleLogin(String code, String registrationId){
         //google api AT 가져오기
         String accessToken = getAccessToken(code, registrationId);
         //AT를 통해 userinfo 조회
