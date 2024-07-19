@@ -1,4 +1,4 @@
-package sendman.backend.Image.controller;
+package sendman.backend.tts.controller;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,14 +12,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import sendman.backend.Image.controller.common.mock.WithCustomMockUser;
-import sendman.backend.Image.service.ImageService;
+import sendman.backend.common.mock.WithCustomMockUser;
+import sendman.backend.tts.service.TtsService;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,23 +32,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ImageControllerTest {
 
     @MockBean
-    ImageService imageService;
+    TtsService ttsService;
 
     @Autowired
     MockMvc mockMvc;
 
     @Test
     @WithCustomMockUser
-    @DisplayName("POST `/image/save` 이미지 업로드 서비스 호출 테스트 (성공)")
+    @DisplayName("POST `/tts/save` 이미지 업로드 서비스 호출 테스트 (성공)")
     void imageSave() throws Exception {
         //Given
         final String file = "test.png";
         MockMultipartFile image = new MockMultipartFile("file",file,
                 "image/png", "<<png data>>".getBytes());
 
-        when(imageService.saveImage(any(),any())).thenReturn(true);
+        when(ttsService.saveImage(any(),any())).thenReturn(true);
         //When & Then
-        mockMvc.perform(multipart("/image/save")
+        mockMvc.perform(multipart("/tts/save")
                     .file(image)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .accept(MediaType.APPLICATION_JSON)
@@ -60,6 +58,6 @@ class ImageControllerTest {
             )
             .andExpect(status().isCreated())
             .andExpect(content().string("true"));
-        verify(imageService).saveImage(any(),any());
+        verify(ttsService).saveImage(any(),any());
     }
 }

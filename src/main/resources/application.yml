@@ -7,7 +7,7 @@ spring:
 # dev tool
 logging:
   level:
-    root: ERROR
+    root: DEBUG
 # springdoc-swagger
 #springdoc:
 #  default-consumes-media-type: application/json;charset=UTF-8

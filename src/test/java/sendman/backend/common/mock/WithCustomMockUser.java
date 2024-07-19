@@ -1,4 +1,4 @@
-package sendman.backend.Image.controller.common.mock;
+package sendman.backend.common.mock;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 

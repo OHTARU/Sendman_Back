@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import sendman.backend.account.domain.Account;
 import sendman.backend.account.repository.AccountRepository;
+import sendman.backend.common.dto.ResponseDTO;
 import sendman.backend.common.service.TokenProvider;
 import sendman.backend.login.dto.AccessTokenResponseDTO;
 import sendman.backend.login.dto.GoogleAccessTokenRequestDTO;
@@ -23,7 +24,7 @@ public class LoginService {
     private final AccountRepository accountRepository;
     private final TokenProvider tokenProvider;
 
-    public ResponseEntity<AccessTokenResponseDTO> googleLogin(String code, String registrationId){
+    public ResponseDTO googleLogin(String code, String registrationId){
         //google api AT 가져오기
         String accessToken = getAccessToken(code, registrationId);
         //AT를 통해 userinfo 조회
@@ -33,18 +34,16 @@ public class LoginService {
         if(accountRepository.findById(userinfo.id()).isPresent()){
             Account user = accountRepository.findById(userinfo.id()).get();
             //유저가 있을 경우 jwt 제공
-            return ResponseEntity.ok().body(
-                    AccessTokenResponseDTO.builder()
-                            .accesstoken(tokenProvider.createAccessToken(String.format("%s:%s",user.getEmail(),"ROLE_USER")))
-                            .message("구글 로그인 성공").build()
+            return new ResponseDTO("로그인 성공",
+                            new AccessTokenResponseDTO(
+                                    tokenProvider.createAccessToken(String.format("%s:%s",user.getEmail(),"ROLE_USER")))
             );
         }else {
             //유저가 없을 경우 회원 저장 후 jwt 제공
             accountRepository.save(Account.from(userinfo));
-            return ResponseEntity.created(URI.create("/login/code?"+code+"/"+registrationId)).body(
-                    AccessTokenResponseDTO.builder()
-                            .accesstoken(tokenProvider.createAccessToken(String.format("%s:%s",userinfo.email(),"ROLE_USER")))
-                            .message("회원가입 성공").build()
+            return new ResponseDTO("회원가입 성공",
+                    new AccessTokenResponseDTO(
+                            tokenProvider.createAccessToken(String.format("%s:%s", userinfo.email(), "ROLE_USER")))
             );
         }
     }
