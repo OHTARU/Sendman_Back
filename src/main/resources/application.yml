@@ -8,12 +8,12 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 file:
-  dir: C:\voice\
+  dir: /home/ubuntu
 
 # dev tool
 logging:
   level:
-    root: ERROR
+    root: DEBUG
 #springdoc-swagger
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8

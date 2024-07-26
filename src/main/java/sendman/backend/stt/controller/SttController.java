@@ -22,7 +22,6 @@ import java.net.URI;
 @Tag(name = "STT",description = "STT API 컨트롤러")
 public class SttController {
     private final SttService sttService;
-    private final AiService aiService;
 
     @RequestMapping(value = "/save", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @Operation(summary = "STT 내용 저장",description = "STT 내용 저장 api")
@@ -44,14 +43,5 @@ public class SttController {
     @ApiResponse(responseCode = "200",description = "리스트 조회 성공")
     public ResponseEntity<ResponseDTO> sttList(@RequestParam(value = "page", defaultValue = "1") int page, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(sttService.getList(user, page - 1));
-    }
-
-    @RequestMapping(value = "/ai", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
-    public ResponseEntity<ResponseDTO> sttAi( @RequestParam(value = "file") MultipartFile file) {
-        try {
-            return ResponseEntity.ok().body(aiService.sstGet(file));
-        } catch (IOException | InterruptedException e) {
-            return ResponseEntity.internalServerError().body(new ResponseDTO("server error", e.getMessage()));
-        }
     }
 }

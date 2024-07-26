@@ -37,10 +37,11 @@ public class SttService {
     private String fileDir;
 
     public ResponseDTO saveVoice(User resUser, MultipartFile file) throws IOException, InterruptedException {
-        //AI API 통신 후 백업
-        String text = aiGetText(file);
         //AWS 파일 저장
         String url = bucket.saveFile(file,"voice");
+
+        //AI API 통신 후 백업
+        String text = aiGetText(file);
 
         // 만료기간 설정 ( 7일 )
         LocalDate exp = LocalDate.now().plusWeeks(1);
@@ -91,7 +92,7 @@ public class SttService {
         file.transferTo(new File(savedPath));
 
         ProcessBuilder builder = new ProcessBuilder(
-                "python", "src/main/resources/model/text_print.py",
+                "src/main/resources/model/myenv/bin/python3", "src/main/resources/model/text_print.py",
                 "--model_path","src/main/resources/model/model_epoch9.pt",
                 "--audio_path", savedPath);
         Process process = builder.start();
