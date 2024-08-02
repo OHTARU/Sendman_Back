@@ -68,7 +68,7 @@ public class SttService {
 
     //매일 0시 5분마다 데이터 삭제
     @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Seoul")
-    private void clearImageData(){
+    public void clearImageData(){
         List<Stt> voices = sttRepository.findByExp(LocalDate.now());
 
         sttRepository.deleteAll(voices);
@@ -106,8 +106,10 @@ public class SttService {
         System.out.println("reader : ");
         while ((ch=reader.read())!=-1) {
             // 실행 결과 처리
-            System.out.print((char)ch);
-            sb.append((char)ch);
+            if (ch != '\n' && ch != '\r') {
+                System.out.print((char) ch);
+                sb.append((char) ch);
+            }
         }
         // 2. 프로세스 종료 대기
         int exitCode = process.waitFor();

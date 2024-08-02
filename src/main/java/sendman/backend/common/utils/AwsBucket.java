@@ -38,6 +38,6 @@ public class AwsBucket {
         amazonS3Client.putObject(savefile);
 
         //s3 버킷에서 url 가져오기
-        return amazonS3Client.getUrl(bucket,"image/"+uuidFileName).toString();
+        return amazonS3Client.getUrl(bucket,path+"/"+uuidFileName).toString();
     }
 }
