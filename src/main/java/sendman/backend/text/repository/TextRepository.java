@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sendman.backend.account.domain.Account;
-import sendman.backend.text.domain.Stt;
 import sendman.backend.text.domain.Text;
 
 import java.time.LocalDate;
