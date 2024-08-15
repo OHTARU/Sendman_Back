@@ -8,7 +8,7 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 file:
-  dir: /home/ubuntu
+  dir: /home/ubuntu/
 
 # dev tool
 logging:

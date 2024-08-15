@@ -118,7 +118,7 @@ public class TextService {
         String savedName = uuid + extension;
 
         // 파일을 불러올 때 사용할 파일 경로
-        String savedPath = fileDir + savedName;
+        String savedPath = fileDir+ "voice/" + savedName;
 
         file.transferTo(new File(savedPath));
 
