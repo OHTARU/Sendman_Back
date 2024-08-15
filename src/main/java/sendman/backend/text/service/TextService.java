@@ -1,27 +1,28 @@
-package sendman.backend.stt.service;
+package sendman.backend.text.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sendman.backend.account.domain.Account;
 import sendman.backend.account.service.AccountService;
 import sendman.backend.common.dto.ResponseDTO;
 import sendman.backend.common.utils.AwsBucket;
-import sendman.backend.stt.domain.Stt;
-import sendman.backend.stt.dto.AiResponseDTO;
-import sendman.backend.stt.repository.SttRepository;
+import sendman.backend.text.domain.SaveType;
+import sendman.backend.text.domain.Text;
+import sendman.backend.text.dto.AiResponseDTO;
+import sendman.backend.text.dto.TextResponseDTO;
+import sendman.backend.text.repository.TextRepository;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,14 +30,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class SttService {
-    private final SttRepository sttRepository;
+public class TextService {
+    private final TextRepository textRepository;
     private final AccountService accountService;
     private final AwsBucket bucket;
     @Value("${file.dir}")
     private String fileDir;
 
-    public ResponseDTO saveVoice(User resUser, MultipartFile file) throws IOException, InterruptedException {
+    public ResponseDTO saveVoice(User resUser, MultipartFile file) throws IOException, InterruptedException, UsernameNotFoundException {
         //AWS 파일 저장
         String url = bucket.saveFile(file,"voice");
 
@@ -48,30 +49,60 @@ public class SttService {
 
         //db 저장
         Account account = accountService.findByAccount(resUser);
-        sttRepository.save(Stt.builder()
+        textRepository.save(Text.builder()
                 .url(url)
                 .account(account)
                 .exp(exp)
                 .text(text)
+                .type(SaveType.STT)
                 .build());
 
         return new ResponseDTO("저장되었습니다", new AiResponseDTO(text));
     }
 
-    //paging 5개씩 데이터 전달
-    public ResponseDTO getList(User user,int pageNum){
-        Account account = accountService.findByAccount(user);
-        Pageable pageable = PageRequest.of(pageNum, 5, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Stt> sttPage = sttRepository.findByAccount(account,pageable);
-        return new ResponseDTO(null, sttPage);
+    public ResponseDTO saveImage(User resUser, String text) throws UnsupportedEncodingException {
+        Account account = accountService.findByAccount(resUser);
+
+        //DB 저장
+        textRepository.save(Text.builder()
+                .text(text)
+                .exp(LocalDate.now())
+                .account(account)
+                .type(SaveType.TTS)
+                .build());
+
+        return new ResponseDTO("저장 되었습니다.",null);
     }
 
     //매일 0시 5분마다 데이터 삭제
     @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Seoul")
-    public void clearImageData(){
-        List<Stt> voices = sttRepository.findByExp(LocalDate.now());
+    public void clearImageData() throws IOException {
+        List<Text> voices = textRepository.findByExp(LocalDate.now());
+        for (Text t : voices){
+            if(t.getType()==SaveType.STT){
+                bucket.deleteFile("voice", t.getUrl());
+            }else {
+                //bucket.deleteFile("image", t.getUrl());
+            }
 
-        sttRepository.deleteAll(voices);
+        }
+        textRepository.deleteAll(voices);
+    }
+
+    //paging 처리 5개씩 데이터 전송
+    public ResponseDTO getList(User user,int pageNum) throws UsernameNotFoundException {
+        Account account = accountService.findByAccount(user);
+        Pageable pageable = PageRequest.of(pageNum, 5, Sort.by(Sort.Direction.DESC, "id"));
+        Page<TextResponseDTO> textPage = textRepository.findByAccount(account,pageable).map(TextResponseDTO::new);
+
+        return new ResponseDTO(pageNum + "번째 페이지 입니다.", textPage);
+    }
+
+    //detail Text 데이터 전송
+    public ResponseDTO getDetail(Long id) throws ChangeSetPersister.NotFoundException {
+        TextResponseDTO textResponseDTO = textRepository.findById(id).map(TextResponseDTO::new)
+                .orElseThrow(ChangeSetPersister.NotFoundException::new);
+        return new ResponseDTO(null, textResponseDTO);
     }
 
     private String aiGetText(MultipartFile file) throws IOException, InterruptedException {
@@ -92,8 +123,7 @@ public class SttService {
         file.transferTo(new File(savedPath));
 
         ProcessBuilder builder = new ProcessBuilder(
-                "src/main/resources/model/myenv/bin/python3", "src/main/resources/model/text_print.py",
-                "--model_path","src/main/resources/model/model_epoch9.pt",
+                "src/main/resources/model/venv/bin/python3", "src/main/resources/model/Ko_STT.py",
                 "--audio_path", savedPath);
         Process process = builder.start();
 
@@ -124,4 +154,6 @@ public class SttService {
 
         return sb.toString();
     }
+
+
 }

@@ -1,4 +1,4 @@
-package sendman.backend.stt.dto;
+package sendman.backend.text.dto;
 
 public record AiResponseDTO(
         String result

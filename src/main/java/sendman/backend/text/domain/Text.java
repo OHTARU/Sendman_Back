@@ -1,4 +1,4 @@
-package sendman.backend.tts.domain;
+package sendman.backend.text.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,18 +11,21 @@ import sendman.backend.common.domain.BaseTime;
 import java.time.LocalDate;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Builder
-public class Tts extends BaseTime {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Text extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    private String url;
     @Column(columnDefinition = "LONGTEXT")
     private String text;
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
     private LocalDate exp;
+    @Enumerated(EnumType.STRING)
+    private SaveType type;
 }

@@ -26,7 +26,7 @@ import java.util.Collections;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private static final String[] ALLOWED_URIS = {"/login/**","/auth/success","/error","/stt/ai"};
+    private static final String[] ALLOWED_URIS = {"/login/**","/auth/success","/error"};
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

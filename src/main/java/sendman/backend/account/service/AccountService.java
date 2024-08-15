@@ -2,6 +2,7 @@ package sendman.backend.account.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import sendman.backend.account.domain.Account;
 import sendman.backend.account.dto.AccountinfoResponseDTO;
@@ -21,6 +22,6 @@ public class AccountService {
                 .name(account.getName()).build();
     }
     public Account findByAccount(User user){
-        return accountRepository.findByEmail(user.getUsername()).orElseThrow(()->new RuntimeException("회원 정보 없음"));
+        return accountRepository.findByEmail(user.getUsername()).orElseThrow(()->new UsernameNotFoundException("회원 정보 없음"));
     }
 }

@@ -1,4 +1,4 @@
-package sendman.backend.stt.controller;
+package sendman.backend.text.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,16 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import sendman.backend.common.dto.ResponseDTO;
 import sendman.backend.common.mock.WithCustomMockUser;
-import sendman.backend.stt.service.SttService;
-
-import java.io.IOException;
+import sendman.backend.text.service.TextService;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -30,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(locations = "classpath:application.yml")
 class SttControllerTest {
     @MockBean
-    SttService sttService;
+    TextService sttService;
     @Autowired
     MockMvc mockMvc;
 
