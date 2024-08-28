@@ -1,5 +1,6 @@
 package sendman.backend.text.repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,5 @@ import java.util.List;
 public interface TextRepository extends JpaRepository<Text, Long> {
     List<Text> findByExp (LocalDate exp);
     Page<Text> findByAccount(Account account,Pageable pageable);
+    void deleteAllByAccount(Account account);
 }

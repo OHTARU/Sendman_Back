@@ -2,6 +2,7 @@ package sendman.backend.text.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -103,6 +104,22 @@ public class TextService {
         TextResponseDTO textResponseDTO = textRepository.findById(id).map(TextResponseDTO::new)
                 .orElseThrow(ChangeSetPersister.NotFoundException::new);
         return new ResponseDTO(null, textResponseDTO);
+    }
+
+    public ResponseDTO deleteText(List<Long> id){
+        try {
+            for (Long i : id){
+                textRepository.deleteById(i);
+            }
+            return new ResponseDTO("Text가 삭제 되었습니다.",null);
+        }catch (EmptyResultDataAccessException e){
+            return new ResponseDTO("오류가 발생되었습니다", e);
+        }
+    }
+
+    public ResponseDTO deleteTextAll(User user){
+        textRepository.deleteAllByAccount(accountService.findByAccount(user));
+        return new ResponseDTO("삭제 되었습니다",null);
     }
 
     private String aiGetText(MultipartFile file) throws IOException, InterruptedException {

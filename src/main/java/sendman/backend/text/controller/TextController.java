@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sendman.backend.common.dto.ResponseDTO;
+import sendman.backend.text.dto.TextDeleteReqeustDTO;
 import sendman.backend.text.service.TextService;
 
 import java.io.IOException;
@@ -77,6 +78,13 @@ public class TextController {
         }catch (ChangeSetPersister.NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
-
+    }
+    @DeleteMapping("/text")
+    public ResponseEntity<ResponseDTO> textDelete(@RequestBody TextDeleteReqeustDTO dto){
+        return ResponseEntity.created(URI.create("/text")).body(textService.deleteText(dto.id()));
+    }
+    @DeleteMapping("/textall")
+    public ResponseEntity<ResponseDTO> textDeleteAll(@AuthenticationPrincipal User user){
+        return ResponseEntity.created(URI.create("/textall")).body(textService.deleteTextAll(user));
     }
 }
