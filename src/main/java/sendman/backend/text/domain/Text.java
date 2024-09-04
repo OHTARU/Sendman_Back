@@ -19,7 +19,6 @@ public class Text extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String url;
     @Column(columnDefinition = "LONGTEXT")
     private String text;
     @ManyToOne

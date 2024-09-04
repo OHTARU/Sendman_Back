@@ -8,6 +8,7 @@ import sendman.backend.account.domain.Account;
 import sendman.backend.account.dto.AccountinfoResponseDTO;
 import sendman.backend.account.repository.AccountRepository;
 import sendman.backend.common.dto.ResponseDTO;
+import sendman.backend.text.repository.TextRepository;
 import sendman.backend.text.service.TextService;
 
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final TextService textService;
+    private final TextRepository textRepository;
 
     public AccountinfoResponseDTO getUser(User user){
         Account account = findByAccount(user);
@@ -29,7 +30,7 @@ public class AccountService {
     }
     public ResponseDTO deleteAccount(User user){
         Account account = findByAccount(user);
-        textService.deleteTextAll(user);
+        textRepository.deleteAllByAccount(findByAccount(user));
         accountRepository.findById(account.getId());
         return new ResponseDTO("회원 탈퇴되었습니다.",null);
     }

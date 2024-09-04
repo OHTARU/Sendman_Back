@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import sendman.backend.account.domain.Account;
 import sendman.backend.account.service.AccountService;
 import sendman.backend.common.dto.ResponseDTO;
-import sendman.backend.common.utils.AwsBucket;
 import sendman.backend.text.domain.SaveType;
 import sendman.backend.text.domain.Text;
 import sendman.backend.text.dto.AiResponseDTO;
@@ -34,16 +33,12 @@ import java.util.UUID;
 public class TextService {
     private final TextRepository textRepository;
     private final AccountService accountService;
-    private final AwsBucket bucket;
     @Value("${file.dir}")
     private String fileDir;
 
     public ResponseDTO saveVoice(User resUser, MultipartFile file) throws IOException, InterruptedException, UsernameNotFoundException {
-        //AWS 파일 저장
-        String url = bucket.saveFile(file,"voice");
-
         //AI API 통신 후 백업
-        String text = aiGetText(file);
+        String text = AIGetText(file,SaveType.STT);
 
         // 만료기간 설정 ( 7일 )
         LocalDate exp = LocalDate.now().plusWeeks(1);
@@ -51,7 +46,6 @@ public class TextService {
         //db 저장
         Account account = accountService.findByAccount(resUser);
         textRepository.save(Text.builder()
-                .url(url)
                 .account(account)
                 .exp(exp)
                 .text(text)
@@ -61,33 +55,30 @@ public class TextService {
         return new ResponseDTO("저장되었습니다", new AiResponseDTO(text));
     }
 
-    public ResponseDTO saveImage(User resUser, String text) throws UnsupportedEncodingException {
-        Account account = accountService.findByAccount(resUser);
+    public ResponseDTO saveImage(User resUser, MultipartFile file) throws IOException, InterruptedException, UsernameNotFoundException {
+        //AI API 통신 후 백업
+        String text = AIGetText(file,SaveType.TTS);
+
+        // 만료기간 설정 ( 7일 )
+        LocalDate exp = LocalDate.now().plusWeeks(1);
 
         //DB 저장
+        Account account = accountService.findByAccount(resUser);
         textRepository.save(Text.builder()
                 .text(text)
-                .exp(LocalDate.now())
+                .exp(exp)
                 .account(account)
                 .type(SaveType.TTS)
                 .build());
 
-        return new ResponseDTO("저장 되었습니다.",null);
+        return new ResponseDTO("저장 되었습니다.",new AiResponseDTO(text));
     }
 
     //매일 0시 5분마다 데이터 삭제
     @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Seoul")
     public void clearImageData() throws IOException {
-        List<Text> voices = textRepository.findByExp(LocalDate.now());
-        for (Text t : voices){
-            if(t.getType()==SaveType.STT){
-                bucket.deleteFile("voice", t.getUrl());
-            }else {
-                //bucket.deleteFile("image", t.getUrl());
-            }
-
-        }
-        textRepository.deleteAll(voices);
+        List<Text> textsData = textRepository.findByExp(LocalDate.now());
+        textRepository.deleteAll(textsData);
     }
 
     //paging 처리 5개씩 데이터 전송
@@ -122,7 +113,7 @@ public class TextService {
         return new ResponseDTO("삭제 되었습니다",null);
     }
 
-    private String aiGetText(MultipartFile file) throws IOException, InterruptedException {
+    private String AIGetText(MultipartFile file, SaveType type) throws IOException, InterruptedException {
         String origName = file.getOriginalFilename();
 
         // 파일 이름으로 쓸 uuid 생성
@@ -135,20 +126,27 @@ public class TextService {
         String savedName = uuid + extension;
 
         // 파일을 불러올 때 사용할 파일 경로
-        String savedPath = fileDir+ "voice/" + savedName;
+        String savedPath = fileDir+type+"/" + savedName;
 
         file.transferTo(new File(savedPath));
 
-        ProcessBuilder builder = new ProcessBuilder(
-                "src/main/resources/model/venv/bin/python3", "src/main/resources/model/Ko_STT.py",
-                "--audio_path", savedPath);
+        //AI 실행
+        ProcessBuilder builder;
+        if (SaveType.STT==type){
+            builder = new ProcessBuilder(
+                    "src/main/resources/model/venv/bin/python3", "src/main/resources/model/Ko_STT.py",
+                    "--audio_path", savedPath);
+        }else{
+            builder = new ProcessBuilder(
+                    "src/main/resources/model/venv/bin/python3", "src/main/resources/model/Ko_STT.py",
+                    "--audio_path", savedPath);
+        }
         Process process = builder.start();
 
         InputStreamReader inputStream = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(inputStream);
 
         StringBuilder sb = new StringBuilder();
-        String line;
         int ch;
         System.out.println("reader : ");
         while ((ch=reader.read())!=-1) {
@@ -171,6 +169,8 @@ public class TextService {
 
         return sb.toString();
     }
+
+
 
 
 }

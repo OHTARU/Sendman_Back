@@ -43,18 +43,20 @@ public class TextController {
         }
     }
 
-    @PostMapping("/tts/save")
+    @RequestMapping(value = "/tts/save", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @Operation(summary = "TTS 내용 저장", description = "TTS 내용 저장 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201",description = "TTS 내용 저장 성공"),
             @ApiResponse(responseCode = "400", description = "요청 정보 오류"),
             @ApiResponse(responseCode = "500",description = "서버 내부 오류")
     })
-    public ResponseEntity<ResponseDTO> ttsSave(@AuthenticationPrincipal User user,@RequestParam(value = "text")String text){
+    public ResponseEntity<ResponseDTO> ttsSave(@AuthenticationPrincipal User user,@RequestParam(value = "file") MultipartFile file){
         try{
-            return ResponseEntity.created(URI.create("/tts/save")).body(textService.saveImage(user, text));
+            return ResponseEntity.created(URI.create("/tts/save")).body(textService.saveImage(user, file));
         } catch (UnsupportedEncodingException e) {
             return ResponseEntity.badRequest().body(new ResponseDTO(e.getMessage(), e.fillInStackTrace()));
+        }catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().body(new ResponseDTO(e.getMessage(), e.fillInStackTrace()));
         }
     }
 
