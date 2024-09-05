@@ -138,8 +138,8 @@ public class TextService {
                     "--audio_path", savedPath);
         }else{
             builder = new ProcessBuilder(
-                    "src/main/resources/model/venv/bin/python3", "src/main/resources/model/Ko_STT.py",
-                    "--audio_path", savedPath);
+                    "src/main/resources/model/venv/bin/python3", "src/main/resources/model/ocr.py",
+                    "--image_path", savedPath);
         }
         Process process = builder.start();
 
